@@ -1,3 +1,32 @@
+#Bluetooth Computation Offloader
+Chuta Sano
+
+##WIP
+Still trying to see how I would approach this...
+
+- My first approach (testing is done) is to send pre-baked apk files through bluetooth.
+
+| Approach | Pros | Cons |
+| -------- | ---- | ---- |
+| 1 | Super easy to implement | requires user installation, takes a bit of time|
+| | |
+
+
+
+
+This demo offloads static computations through bluetooth connected devices by sending a byte encoded APK file containing the computation through bluetooth. The receiving device would then run the computation to emulate a startActivityForResult call.
+
+
+This is based off Google's Android Bluetooth Chat demo.
+Plan to replace string messages to byte arrays and then implemented an encoding/decoding scheme from byte -> apk file
+
+
+TODO: clean up 
+	Dynamic computation using reflection?
+      Testing on speed + usefulness
+
+	  
+	  
 
 Android BluetoothChat Sample
 ===================================

