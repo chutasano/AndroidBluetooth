@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\exploded-aar\com.android.support\support-v4\24.1.1\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="6d7d803871e3203465f71a163e7af104f807b446">
+        <dex dex="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\pre-dexed\debug\com.android.support-support-v4-24.1.1_3e5a72234a9b6aaf839b935d9fbefe77eb11e48f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\exploded-aar\com.android.support\support-v4\24.1.1\jars\libs\internal_impl-24.1.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="f78c2f395cb096f9dc1dc07e729922b8fcd3c4f5">
+        <dex dex="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\pre-dexed\debug\internal_impl-24.1.1_ddb370945642530c1803e72c1b7fce4d779f3177.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\exploded-aar\com.android.support\cardview-v7\24.1.1\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="4add8aa95c9f4e9a2ad64b7e2bf08e97e28955c1">
+        <dex dex="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\pre-dexed\debug\com.android.support-cardview-v7-24.1.1_6930389f8ba1d02d76e69830eb660871d3ca794d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\exploded-aar\com.android.support\appcompat-v7\24.1.1\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="1256c10604bb098490eab070d76754ac5ceab35c">
+        <dex dex="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\pre-dexed\debug\com.android.support-appcompat-v7-24.1.1_916cd014629bfc30f3c4bf935408c75a059c8247.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\24.1.1\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="c936c1bd42f0c018c18920c7bec619ef056b24f8">
+        <dex dex="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\pre-dexed\debug\com.android.support-animated-vector-drawable-24.1.1_b89e3ae60b0ed57a8538a3dd33dc6b8f4f07d234.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\chuta\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\24.1.1\support-annotations-24.1.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="3af19f153122737b372622fa6c81dd11a1c6b999">
+        <dex dex="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\pre-dexed\debug\support-annotations-24.1.1_4dd9d5c5f0cabba587b7d4d06f41cb20f61fad9d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\24.1.1\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="f62e763609f65e47dc6c498760a4accf02776788">
+        <dex dex="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\pre-dexed\debug\com.android.support-support-vector-drawable-24.1.1_a19e2e6178ffce73a7f04bfbf329ab0c13b0a899.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\exploded-aar\com.android.support\gridlayout-v7\24.1.1\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.1"
+        sha1="8a5380ddd58f4f8946ddade4c64dd77de4a836d5">
+        <dex dex="C:\Users\chuta\Desktop\GoogleGlass\Bluetooth\Application\build\intermediates\pre-dexed\debug\com.android.support-gridlayout-v7-24.1.1_0eccc3cc25885f369e0b0696b55a05651d882c6e.jar" />
+    </item>
+
+</items>
