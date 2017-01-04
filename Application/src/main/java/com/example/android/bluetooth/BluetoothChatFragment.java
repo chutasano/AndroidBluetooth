@@ -20,6 +20,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -56,6 +57,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * This fragment controls Bluetooth to communicate with other devices.
@@ -69,10 +71,15 @@ public class BluetoothChatFragment extends Fragment {
     private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
     private static final int REQUEST_ENABLE_BT = 3;
 
+    private static final byte[] fileEOF = "This is an arbitrarilly generoiaiojifdskfdsilsiijjisjfkm,vp".getBytes(); // TODO
+    private File file;
+
     // Layout Views
     private ListView mConversationView;
     private EditText mOutEditText;
     private Button mSendButton;
+
+    private boolean readFile = false;
 
     /**
      * Name of the connected device
@@ -127,6 +134,11 @@ public class BluetoothChatFragment extends Fragment {
         } else if (mChatService == null) {
             setupChat();
         }
+        readFile = true;
+        File cascadeDir = new File(Environment.getExternalStorageDirectory().getPath() + "/chutaIsHere/");
+        cascadeDir.mkdirs();
+        file = new File(cascadeDir, "app.apk");
+        file.delete();
     }
 
     @Override
@@ -190,19 +202,32 @@ public class BluetoothChatFragment extends Fragment {
                     String message = textView.getText().toString();
                     sendMessage(message);
                 }*/
+
+                //method 1
                 try {
+                    //process: download file, install apk, return startActivityForResult via BT
                     InputStream is = getResources().openRawResource(R.raw.app);
                     File cascadeDir = new File(Environment.getExternalStorageDirectory().getPath() + "/chutaIsHere/");
                     cascadeDir.mkdirs();
-                    File mCascadeFile = new File(cascadeDir, "ay.apk");
+                    File mCascadeFile = new File(cascadeDir, "app.apk");
+                    //mCascadeFile.delete();
                     FileOutputStream os = new FileOutputStream(mCascadeFile);
-
-                    byte[] buffer = new byte[4096];
+                    //int bufSize = 1024; //seems to be the limit?
+                    //int bufSize = 4096; //2^12
+                    int bufSize = 4096; //2^16   //TODO testing on buffersize
+                    //int bufSize = 262144; //2^18
+                    byte[] buffer = new byte[bufSize];
                     int bytesRead;
+                    //sendBytes(fileEOF);
                     try {
-                        while ((bytesRead = is.read(buffer)) != -1) {
-                            os.write(buffer, 0, bytesRead);
+                        byte[] header = {0x00};
+                        sendBytes(header);
+                        while (is.read(buffer) != -1) {
+                            sendBytes(buffer);
                         }
+                        is.read(buffer, 0, is.available());
+                        sendBytes(buffer);
+                        sendBytes(fileEOF);
                         is.close();
                         os.close();
                     } catch (IOException e) {
@@ -210,7 +235,17 @@ public class BluetoothChatFragment extends Fragment {
                     }
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setDataAndType(Uri.fromFile(mCascadeFile), "application/vnd.android.package-archive");
-                    startActivity(intent);
+                    getActivity().startActivity(intent);
+                    //
+                    // mCascadeFile.delete();
+                    /*try {
+                        Intent i = getActivity().getPackageManager().getLaunchIntentForPackage("com.example.chuta.opensetting");
+                        //startActivity(i);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.e(TAG, e.toString());
+                    }*/
                 /*
                 byte[] ay = ByteEncoder.readBytesFromFile(mCascadeFile);
                 byte[] header = {0x00};
@@ -222,6 +257,9 @@ public class BluetoothChatFragment extends Fragment {
                 {
                     Log.e(TAG, e.toString());
                 }
+
+                //method 2: use CPS?
+
             }
         });
 
@@ -351,14 +389,15 @@ public class BluetoothChatFragment extends Fragment {
                 case Constants.BYTES_SEND:
                     byte[] writeBuf = (byte[]) msg.obj;
                     // construct a string from the buffer
-                    String writeMessage = new String(writeBuf);
-                    mConversationArrayAdapter.add("Me:  " + writeMessage);
+                    mConversationArrayAdapter.add("Me: Sent " + writeBuf.length + " bytes");
                     break;
                 case Constants.BYTES_RECEIVE:
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
+                    handleByteMessage(readBuf);
                     mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
+                    //mConversationArrayAdapter.add(mConnectedDeviceName + ": Received " + readBuf.length + " bytes");
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name
@@ -389,17 +428,42 @@ public class BluetoothChatFragment extends Fragment {
             0x01: run the file and return result ex: [01] [file]
 
          */
-        switch(data[0]) {
-            case Constants.ops.ACTIVITY_RESULT: //0
-                runActivity(Arrays.copyOfRange(data, 1, data.length), false);
-                break;
-            case Constants.ops.ACTIVITY_NO_RESULT: //1
-                runActivity(Arrays.copyOfRange(data, 1, data.length), true);
-                break;
-            default:
-                Log.e(TAG, "Given message with unrecognized header: " + Byte.toString(data[0]));
-                break;
+        if (data.length == 1 && !readFile) //header
+        {
+            readFile = true;
+            File cascadeDir = new File(Environment.getExternalStorageDirectory().getPath() + "/chutaIsHere/");
+            cascadeDir.mkdirs();
+            file = new File(cascadeDir, "app.apk");
+            file.delete();
         }
+        else if (Collections.indexOfSubList(Arrays.asList(data), Arrays.asList(fileEOF)) != -1)
+        {
+            try {
+                FileOutputStream os = new FileOutputStream(file, true);
+                os.write(data, 0, Collections.indexOfSubList(Arrays.asList(data), Arrays.asList(fileEOF)));
+                os.close();
+            }
+            catch (Exception ex)
+            {
+                Log.e(TAG, ex.toString());
+            }
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+            getActivity().startActivity(intent);
+        }
+        else
+        {
+            try {
+                FileOutputStream os = new FileOutputStream(file, true);
+                os.write(data, 0, data.length);
+                os.close();
+            }
+            catch (Exception ex)
+            {
+                Log.e(TAG, ex.toString());
+            }
+        }
+
     }
 
     private void runActivity(byte[] data, boolean returnResult)
@@ -444,6 +508,7 @@ public class BluetoothChatFragment extends Fragment {
                             Toast.LENGTH_SHORT).show();
                     getActivity().finish();
                 }
+                break;
         }
     }
 

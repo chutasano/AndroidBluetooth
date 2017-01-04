@@ -2,9 +2,12 @@
 Chuta Sano
 
 ##WIP
-Still trying to see how I would approach this...
+Project halted for now. See my AndroidContinuations project
 
-- My first approach (testing is done) is to send pre-baked apk files through bluetooth.
+- First approach (testing is done) is to send pre-baked apk files through bluetooth.
+  - Tl;dr: way too slow of a process
+- Second approach is to be boring and pre-configure a receiver apk that takes in certain data
+  - I want to abstractify this. Looking into continuations
 
 | Approach | Pros | Cons |
 | -------- | ---- | ---- |
@@ -26,7 +29,7 @@ TODO: clean up
       Testing on speed + usefulness
 
 	  
-	  
+Google's demo readme below: plan to delete it later
 
 Android BluetoothChat Sample
 ===================================
